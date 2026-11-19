@@ -1,0 +1,42 @@
+<section class="section contact-message" id="send-message">
+  <div class="inner split-section contact-message-layout">
+    <div class="split-copy">
+      <h2>Send Andreas a message</h2>
+      <p>Have a question about identity security or want to discuss a potential engagement? Tell us what you have in mind. Andreas will reply by email.</p>
+      <div class="contact-availability">
+        <h3>Looking for availability?</h3>
+        <p>We’re currently fully booked. Join the waiting list to hear when spots open up again.</p>
+        <button class="button button-secondary" type="button" data-cta="primary" data-lead-capture>Join the waiting list</button>
+      </div>
+    </div>
+    <form class="contact-form" action="/api/contact" method="post" aria-label="Send Andreas a message" data-native-contact-form>
+      <label class="form-field lead-form-honeypot" aria-hidden="true">
+        Company
+        <input type="text" name="company" tabindex="-1" autocomplete="off">
+      </label>
+      <label class="form-field">
+        Full name
+        <input type="text" name="name" autocomplete="name" maxlength="120" required>
+      </label>
+      <label class="form-field">
+        Email address
+        <input type="email" name="email" autocomplete="email" maxlength="180" required>
+      </label>
+      <label class="form-field">
+        Organisation (optional)
+        <input type="text" name="organisation" autocomplete="organization" maxlength="180">
+      </label>
+      <label class="form-field">
+        Subject
+        <input type="text" name="subject" maxlength="180" required>
+      </label>
+      <label class="form-field">
+        Your message
+        <textarea name="message" rows="6" maxlength="3000" required></textarea>
+      </label>
+      <p class="form-legal">We’ll use your details to respond to your enquiry. Read our <a href="/legal/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>.</p>
+      <button class="button" type="submit" data-native-contact-submit>Send message</button>
+      <p class="lead-form-status" data-native-contact-status role="status" aria-live="polite" hidden></p>
+    </form>
+  </div>
+</section>

@@ -1,3 +1,4 @@
 .dev.vars*
 .env*
 !.env.example
+.qa/

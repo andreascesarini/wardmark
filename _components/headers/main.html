@@ -1,8 +1,8 @@
 <header class="site-header">
   <div class="inner nav">
-    <a class="brand" href="/">
-      <span class="brand-mark" aria-hidden="true">SMB</span>
-      <span data-setting="business.name">Example Service Business</span>
+    <a class="brand" href="/" aria-label="Wardmark home">
+      <img class="brand-mark" src="/_assets/icons/wardmark-mark.svg" width="60" height="51" alt="">
+      <span data-setting="business.name">Wardmark</span>
     </a>
     <button class="nav-toggle" type="button" aria-controls="primary-navigation" aria-expanded="false" aria-label="Open navigation">
       <span></span>
@@ -10,19 +10,31 @@
       <span></span>
     </button>
     <nav class="nav-links" id="primary-navigation" aria-label="Main navigation">
-      <a href="/">Home</a>
       <details class="nav-dropdown">
         <summary>Services</summary>
         <div class="nav-dropdown-menu">
-          <a href="/services/service-one/">Service One</a>
-          <a href="/services/service-two/">Service Two</a>
-          <a href="/services/service-three/">Service Three</a>
+          <a href="/services/">
+            <span>All services</span>
+          </a>
+          <a href="/services/active-directory-entra-id-security/">
+            <span>Active Directory &amp; Entra ID Security</span>
+          </a>
+          <a href="/services/identity-architecture-migration/">
+            <span>Identity Architecture &amp; Migration</span>
+          </a>
+          <a href="/services/access-governance/">
+            <span>Access Governance</span>
+          </a>
+          <a href="/services/ai-agent-identity-readiness/">
+            <span>AI Agent Identity Readiness</span>
+          </a>
         </div>
       </details>
       <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
     </nav>
     <div class="nav-action">
-      <button class="button" type="button" data-cta="primary" data-lead-capture>Request a Quote</button>
+      <button class="button" type="button" data-cta="primary" data-lead-capture>Join the waiting list</button>
     </div>
   </div>
 </header>

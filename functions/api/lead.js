@@ -1,4 +1,5 @@
 const RESEND_EMAILS_ENDPOINT = "https://api.resend.com/emails";
+const WAITING_LIST_SUCCESS_MESSAGE = "Thank you. You’re on the waiting list.";
 
 function jsonResponse(body, status = 200) {
   return Response.json(body, {
@@ -62,8 +63,10 @@ function createLead(formData) {
   return {
     name: getField(formData, "name", 120),
     email: getField(formData, "email", 180),
-    phone: getField(formData, "phone", 80),
-    service: getField(formData, "service", 160),
+    phone: getField(formData, "phone", 32).replace(/[ ().-]/g, ""),
+    smsMarketingConsent: formData.get("smsMarketingConsent") === "true",
+    emailMarketingConsent: formData.get("emailMarketingConsent") === "true",
+    organisation: getField(formData, "organisation", 180),
     message: getField(formData, "message", 3000),
     businessName: getField(formData, "businessName", 180),
     company: getField(formData, "company", 120),
@@ -75,19 +78,25 @@ function validateLead(lead) {
   const errors = [];
 
   if (!lead.name) {
-    errors.push("Name is required.");
+    errors.push("Full name is required.");
   }
 
   if (!isValidEmail(lead.email)) {
-    errors.push("A valid email is required.");
+    errors.push("A valid work email is required.");
   }
 
-  if (!lead.phone) {
-    errors.push("Phone is required.");
+  if (lead.phone && !/^\+[1-9]\d{6,14}$/.test(lead.phone)) {
+    errors.push("Enter a valid mobile number with its country code, starting with +.");
+  } else if (lead.smsMarketingConsent && !lead.phone) {
+    errors.push("Enter your mobile number for marketing texts, or leave the SMS checkbox unchecked.");
   }
 
-  if (!lead.service && !lead.message) {
-    errors.push("Select a service or add a message so we know how to help.");
+  if (!lead.organisation) {
+    errors.push("Organisation is required.");
+  }
+
+  if (!lead.message) {
+    errors.push("Tell us a little about your business.");
   }
 
   return errors;
@@ -95,11 +104,13 @@ function validateLead(lead) {
 
 function renderLeadDetails(lead) {
   const details = [
-    ["Name", lead.name],
-    ["Email", lead.email],
-    ["Phone", lead.phone],
-    ["Service", lead.service],
-    ["Message", lead.message]
+    ["Full name", lead.name],
+    ["Work email", lead.email],
+    ["Mobile number", lead.phone],
+    ["Organisation", lead.organisation],
+    ["Tell us a little about your business", lead.message],
+    ["SMS marketing consent", lead.smsMarketingConsent ? "Yes" : "No"],
+    ["Email marketing consent", lead.emailMarketingConsent ? "Yes" : "No"]
   ].filter(([, value]) => value);
 
   return details.map(([label, value]) => {
@@ -109,23 +120,26 @@ function renderLeadDetails(lead) {
 
 function renderLeadText(lead) {
   const details = [
-    `Name: ${lead.name}`,
-    `Email: ${lead.email}`,
-    `Phone: ${lead.phone}`,
-    lead.service ? `Service: ${lead.service}` : ""
+    `Full name: ${lead.name}`,
+    `Work email: ${lead.email}`,
+    `Organisation: ${lead.organisation}`
   ].filter((line) => line !== "");
 
   if (lead.message) {
-    details.push("", "Message:", lead.message);
+    details.push("", "Tell us a little about your business:", lead.message);
   }
+
+  if (lead.phone) details.push("", `Mobile number: ${lead.phone}`);
+  details.push("", `SMS marketing consent: ${lead.smsMarketingConsent ? "Yes" : "No"}`);
+  details.push(`Email marketing consent: ${lead.emailMarketingConsent ? "Yes" : "No"}`);
 
   return details.join("\n");
 }
 
 function buildBusinessEmail(config, lead) {
   const html = `
-    <h1>New Lead: ${escapeHtml(lead.name)}</h1>
-    <p>A new inquiry was submitted from the website.</p>
+    <h1>Waiting list: ${escapeHtml(lead.name)}</h1>
+    <p>A new waiting-list request was submitted from the website.</p>
     <table cellpadding="8" cellspacing="0" border="0">
       ${renderLeadDetails(lead)}
     </table>
@@ -136,12 +150,12 @@ function buildBusinessEmail(config, lead) {
     from: config.fromEmail,
     to: [config.businessEmail],
     reply_to: lead.email,
-    subject: `New Lead: ${lead.name}`,
+    subject: `Waiting list: ${lead.name}`,
     html,
     text: [
-      `New Lead: ${lead.name}`,
+      `Waiting list: ${lead.name}`,
       "",
-      "A new inquiry was submitted from the website.",
+      "A new waiting-list request was submitted from the website.",
       "",
       renderLeadText(lead),
       "",
@@ -152,10 +166,11 @@ function buildBusinessEmail(config, lead) {
 
 function buildLeadConfirmationEmail(config, lead) {
   const businessName = lead.businessName || "the business";
-  const subject = lead.businessName ? `${lead.businessName} received your message` : "We received your message";
+  const subject = lead.businessName ? `You’re on the ${lead.businessName} waiting list` : "You’re on the waiting list";
   const html = `
     <h1>Thanks, ${escapeHtml(lead.name)}.</h1>
-    <p>Thanks for contacting ${escapeHtml(businessName)}. We received your message and will follow up shortly.</p>
+    <p>${WAITING_LIST_SUCCESS_MESSAGE}</p>
+    <p>Thanks for contacting ${escapeHtml(businessName)}. We’ll be in touch when spots open up again.</p>
     <p>Here is a copy of what you sent:</p>
     <table cellpadding="8" cellspacing="0" border="0">
       ${renderLeadDetails(lead)}
@@ -168,7 +183,7 @@ function buildLeadConfirmationEmail(config, lead) {
     reply_to: config.businessEmail,
     subject,
     html,
-    text: `Thanks, ${lead.name}.\n\nThanks for contacting ${businessName}. We received your message and will follow up shortly.\n\n${renderLeadText(lead)}`
+    text: `Thanks, ${lead.name}.\n\n${WAITING_LIST_SUCCESS_MESSAGE}\n\nThanks for contacting ${businessName}. We’ll be in touch when spots open up again.\n\n${renderLeadText(lead)}`
   };
 }
 
@@ -191,13 +206,20 @@ async function sendResendEmail(config, payload) {
 }
 
 export async function onRequestPost(context) {
-  const formData = await context.request.formData();
+  let formData;
+
+  try {
+    formData = await context.request.formData();
+  } catch {
+    return jsonResponse({ ok: false, message: "Please submit a valid form." }, 400);
+  }
+
   const lead = createLead(formData);
 
   if (lead.company) {
     return jsonResponse({
       ok: true,
-      message: "Thanks. We received your request and will follow up shortly."
+      message: WAITING_LIST_SUCCESS_MESSAGE
     });
   }
 
@@ -216,7 +238,7 @@ export async function onRequestPost(context) {
     console.error(`Missing lead form environment variables: ${missing.join(", ")}`);
     return jsonResponse({
       ok: false,
-      message: "Lead delivery is not configured yet."
+      message: "Sorry, something went wrong. Please try again or contact us directly."
     }, 500);
   }
 
@@ -232,7 +254,7 @@ export async function onRequestPost(context) {
 
     return jsonResponse({
       ok: true,
-      message: "Thanks. We received your request and will follow up shortly."
+      message: WAITING_LIST_SUCCESS_MESSAGE
     });
   } catch (error) {
     console.error(error);

@@ -618,6 +618,19 @@ a {
   margin-top: 28px;
 }
 
+.services-overview-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.services-overview-grid .service-item {
+  padding-top: 28px;
+}
+
+.services-overview-grid .service-item:focus-visible {
+  outline: 3px solid var(--color-brand);
+  outline-offset: 4px;
+}
+
 .service-item {
   display: block;
   overflow: hidden;
@@ -1704,10 +1717,23 @@ a {
   width: 100%;
 }
 
-.lead-capture-form {
+.lead-capture-form,
+.contact-form {
   width: 100%;
   display: grid;
   gap: 16px;
+}
+
+.contact-message-layout {
+  align-items: start;
+}
+
+.contact-form {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 32px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
 }
 
 .lead-form-honeypot {
@@ -1776,7 +1802,8 @@ a {
   color: #991b1b;
 }
 
-.lead-capture-form .button:disabled {
+.lead-capture-form .button:disabled,
+.contact-form .button:disabled {
   cursor: wait;
   opacity: 0.72;
 }
@@ -1959,7 +1986,8 @@ a {
   }
 
   .benefit-list,
-  .service-list {
+  .service-list,
+  .services-overview-grid {
     grid-template-columns: 1fr;
   }
 

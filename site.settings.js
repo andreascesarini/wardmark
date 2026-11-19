@@ -1,11 +1,11 @@
 window.SiteSettings = {
   business: {
-    name: "Example Service Business",
-    shortName: "Example Business",
+    name: "Wardmark",
+    shortName: "Wardmark",
     phone: "(555) 123-4567",
     email: "hello@example.com",
     address: "123 Main Street, Suite 100, Your City, ST 00000",
-    websiteUrl: "https://example.com/"
+    websiteUrl: ""
   },
 
   legal: {
@@ -23,7 +23,7 @@ window.SiteSettings = {
 
   ctas: {
     primary: {
-      label: "Request a Quote"
+      label: "Join the waiting list"
     }
   },
 
@@ -40,19 +40,47 @@ window.SiteSettings = {
 
     native: {
       endpoint: "/api/lead",
-      successMessage: "Thanks. We received your message and will follow up shortly.",
+      submitLabel: "Join the waiting list",
+      successMessage: "Thank you. You’re on the waiting list.",
       errorMessage: "Sorry, something went wrong. Please try again or contact us directly.",
-      sendLeadConfirmation: true,
-      serviceOptions: [
-        "Service One",
-        "Service Two",
-        "Service Three"
-      ]
+      sendLeadConfirmation: true
     }
   },
 
   media: {
-    heroImages: {}
+    heroImages: {
+      home: {
+        src: "/_assets/media/images/wardmark-hero.png",
+        alt: "",
+        position: "center",
+        loading: "eager",
+        fetchPriority: "high"
+      },
+      "active-directory-entra-id-security": {
+        src: "/_assets/media/images/service-ad-entra.png",
+        alt: "",
+        loading: "eager",
+        fetchPriority: "high"
+      },
+      "identity-architecture-migration": {
+        src: "/_assets/media/images/service-identity-migration.png",
+        alt: "",
+        loading: "eager",
+        fetchPriority: "high"
+      },
+      "access-governance": {
+        src: "/_assets/media/images/service-access-governance.png",
+        alt: "",
+        loading: "eager",
+        fetchPriority: "high"
+      },
+      "ai-agent-identity-readiness": {
+        src: "/_assets/media/images/service-ai-agent.png",
+        alt: "",
+        loading: "eager",
+        fetchPriority: "high"
+      }
+    }
   },
 
   integrations: {

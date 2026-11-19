@@ -28,116 +28,140 @@ window.SiteTemplate = {
       "schedule-booking": "/_components/sections/schedule-booking.html",
       faq: "/_components/sections/faq.html",
       "final-cta": "/_components/sections/final-cta.html",
-      "service-one-hero": "/_components/sections/services/service-one/hero.html",
-      "service-one-intro": "/_components/sections/services/service-one/intro.html",
-      "service-one-benefits": "/_components/sections/services/service-one/benefits.html",
-      "service-two-hero": "/_components/sections/services/service-two/hero.html",
-      "service-two-intro": "/_components/sections/services/service-two/intro.html",
-      "service-two-benefits": "/_components/sections/services/service-two/benefits.html",
-      "service-three-hero": "/_components/sections/services/service-three/hero.html",
-      "service-three-intro": "/_components/sections/services/service-three/intro.html",
-      "service-three-benefits": "/_components/sections/services/service-three/benefits.html",
+      "services-hero": "/_components/sections/services/overview/hero.html",
+      "services-offers": "/_components/sections/services/overview/offers.html",
+      "services-delivery": "/_components/sections/services/overview/delivery.html",
+      "services-faq": "/_components/sections/services/overview/faq.html",
+      "ad-entra-hero": "/_components/sections/services/active-directory-entra-id-security/hero.html",
+      "ad-entra-intro": "/_components/sections/services/active-directory-entra-id-security/intro.html",
+      "ad-entra-benefits": "/_components/sections/services/active-directory-entra-id-security/benefits.html",
+      "ad-entra-faq": "/_components/sections/services/active-directory-entra-id-security/faq.html",
+      "identity-architecture-hero": "/_components/sections/services/identity-architecture-migration/hero.html",
+      "identity-architecture-intro": "/_components/sections/services/identity-architecture-migration/intro.html",
+      "identity-architecture-benefits": "/_components/sections/services/identity-architecture-migration/benefits.html",
+      "identity-architecture-faq": "/_components/sections/services/identity-architecture-migration/faq.html",
+      "access-governance-hero": "/_components/sections/services/access-governance/hero.html",
+      "access-governance-intro": "/_components/sections/services/access-governance/intro.html",
+      "access-governance-benefits": "/_components/sections/services/access-governance/benefits.html",
+      "access-governance-faq": "/_components/sections/services/access-governance/faq.html",
+      "ai-agent-readiness-hero": "/_components/sections/services/ai-agent-identity-readiness/hero.html",
+      "ai-agent-readiness-intro": "/_components/sections/services/ai-agent-identity-readiness/intro.html",
+      "ai-agent-readiness-benefits": "/_components/sections/services/ai-agent-identity-readiness/benefits.html",
+      "ai-agent-readiness-faq": "/_components/sections/services/ai-agent-identity-readiness/faq.html",
       "about-hero": "/_components/sections/about/hero.html",
       "about-intro": "/_components/sections/about/intro.html",
       "about-story": "/_components/sections/about/story.html",
       "about-bio": "/_components/sections/about/bio.html",
+      "about-faq": "/_components/sections/about/faq.html",
+      "contact-hero": "/_components/sections/contact/hero.html",
+      "contact-faq": "/_components/sections/contact/faq.html",
+      "contact-message": "/_components/sections/contact/message.html",
       "location-contact": "/_components/sections/location-contact.html"
     }
   },
 
   pages: {
     home: {
-      title: "Generic SMB Website Template",
+      title: "Identity Security in Sweden & Switzerland | Wardmark",
       seo: {
-        focusKeyword: "local service business",
-        secondaryKeywords: [
-          "small business services",
-          "local service provider",
-          "book a consultation",
-          "request a quote"
-        ],
-        metaTitle: "Local Service Business | Generic SMB Template",
-        metaDescription: "A flexible website template for local service businesses with service pages, lead capture, reviews, contact details, and booking embeds.",
+        focusKeyword: "Identity security",
+        metaTitle: "Identity Security in Sweden & Switzerland | Wardmark",
+        metaDescription: "Wardmark provides identity security for regulated organisations in Sweden and Switzerland, from Active Directory and Entra ID to AI agent access.",
         canonicalPath: "/"
       },
       header: "main",
-      sections: ["home-hero", "trust-strip", "home-intro", "home-services", "home-business-showcase", "home-benefits", "home-bio", "home-why-us", "reviews", "location-contact", "faq", "final-cta"],
+      sections: ["home-hero", "home-intro", "home-services", "home-why-us", "home-benefits", "home-bio", "reviews", "faq", "final-cta"],
       footer: "main"
     },
 
-    "service-one": {
-      title: "Service One | Generic SMB Template",
+    services: {
+      title: "Identity Security Services | Wardmark",
       seo: {
-        focusKeyword: "primary service",
-        secondaryKeywords: [
-          "service one",
-          "local service",
-          "request a quote",
-          "service provider"
-        ],
-        metaTitle: "Service One | Generic SMB Template",
-        metaDescription: "A generic service detail page template for the primary service offered by a local business.",
-        canonicalPath: "/services/service-one/"
+        focusKeyword: "Identity security services",
+        metaTitle: "Identity Security Services | Wardmark",
+        metaDescription: "Identity security services for regulated organisations in Sweden and Switzerland, covering Active Directory, Entra ID, access governance and AI agents.",
+        canonicalPath: "/services/"
       },
       header: "main",
-      sections: ["service-one-hero", "service-one-intro", "service-one-benefits", "location-contact"],
+      sections: ["services-hero", "services-offers", "services-delivery", "services-faq", "final-cta"],
       footer: "main"
     },
 
-    "service-two": {
-      title: "Service Two | Generic SMB Template",
+    "active-directory-entra-id-security": {
+      title: "Active Directory and Entra ID Security | Wardmark",
       seo: {
-        focusKeyword: "secondary service",
-        secondaryKeywords: [
-          "service two",
-          "service package",
-          "local business service",
-          "book a consultation"
-        ],
-        metaTitle: "Service Two | Generic SMB Template",
-        metaDescription: "A generic service detail page template for a secondary service, package, or recurring offer.",
-        canonicalPath: "/services/service-two/"
+        focusKeyword: "Active Directory and Entra ID security",
+        metaTitle: "Active Directory and Entra ID Security | Wardmark",
+        metaDescription: "Active Directory and Entra ID security for regulated organisations in Sweden and Switzerland. Review privileged access and plan hardening changes.",
+        canonicalPath: "/services/active-directory-entra-id-security/"
       },
       header: "main",
-      sections: ["service-two-hero", "service-two-intro", "service-two-benefits", "location-contact"],
+      sections: ["ad-entra-hero", "ad-entra-intro", "ad-entra-benefits", "ad-entra-faq", "final-cta"],
       footer: "main"
     },
 
-    "service-three": {
-      title: "Service Three | Generic SMB Template",
+    "identity-architecture-migration": {
+      title: "Identity Architecture and Migration | Wardmark",
       seo: {
-        focusKeyword: "specialty service",
-        secondaryKeywords: [
-          "service three",
-          "specialty service",
-          "premium service",
-          "local service expert"
-        ],
-        metaTitle: "Service Three | Generic SMB Template",
-        metaDescription: "A generic service detail page template for a specialty, premium, or differentiating service.",
-        canonicalPath: "/services/service-three/"
+        focusKeyword: "Identity architecture and migration",
+        metaTitle: "Identity Architecture and Migration | Wardmark",
+        metaDescription: "Identity architecture and migration for regulated organisations in Sweden and Switzerland. Plan directory consolidations and moves to Microsoft Entra ID.",
+        canonicalPath: "/services/identity-architecture-migration/"
       },
       header: "main",
-      sections: ["service-three-hero", "service-three-intro", "service-three-benefits", "location-contact"],
+      sections: ["identity-architecture-hero", "identity-architecture-intro", "identity-architecture-benefits", "identity-architecture-faq", "final-cta"],
+      footer: "main"
+    },
+
+    "access-governance": {
+      title: "Access Governance for Regulated Organisations | Wardmark",
+      seo: {
+        focusKeyword: "Access governance",
+        metaTitle: "Access Governance for Regulated Organisations | Wardmark",
+        metaDescription: "Access governance for regulated organisations in Sweden and Switzerland. Define roles, assign ownership and keep a clear record of access decisions.",
+        canonicalPath: "/services/access-governance/"
+      },
+      header: "main",
+      sections: ["access-governance-hero", "access-governance-intro", "access-governance-benefits", "access-governance-faq", "final-cta"],
+      footer: "main"
+    },
+
+    "ai-agent-identity-readiness": {
+      title: "AI Agent Identity Readiness | Wardmark",
+      seo: {
+        focusKeyword: "AI agent identity readiness",
+        metaTitle: "AI Agent Identity Readiness | Wardmark",
+        metaDescription: "AI agent identity readiness for regulated organisations in Sweden and Switzerland. Define permissions, ownership and reviews before agents go live.",
+        canonicalPath: "/services/ai-agent-identity-readiness/"
+      },
+      header: "main",
+      sections: ["ai-agent-readiness-hero", "ai-agent-readiness-intro", "ai-agent-readiness-benefits", "ai-agent-readiness-faq", "final-cta"],
       footer: "main"
     },
 
     about: {
-      title: "About | Generic SMB Template",
+      title: "About Wardmark | Identity Security Specialist",
       seo: {
-        focusKeyword: "about local service business",
-        secondaryKeywords: [
-          "business story",
-          "service team",
-          "company values",
-          "local business"
-        ],
-        metaTitle: "About | Generic SMB Template",
-        metaDescription: "Introduce the business, team, values, and customer experience behind a local service provider.",
+        focusKeyword: "Identity security specialist",
+        metaTitle: "About Wardmark | Identity Security Specialist",
+        metaDescription: "Meet Andreas Eriksson, the identity security specialist behind Wardmark, with 15+ years of experience across Sweden, Australia and Switzerland.",
         canonicalPath: "/about/"
       },
       header: "main",
-      sections: ["about-hero", "about-intro", "about-story", "about-bio", "location-contact"],
+      sections: ["about-hero", "about-intro", "about-story", "about-bio", "about-faq", "final-cta"],
+      footer: "main"
+    },
+
+    contact: {
+      title: "Contact Wardmark | Send a Message",
+      seo: {
+        focusKeyword: "Contact Wardmark",
+        metaTitle: "Contact Wardmark | Send a Message",
+        metaDescription: "Contact Andreas Eriksson at Wardmark about identity security services in Sweden and Switzerland. Send a message and receive a reply by email.",
+        canonicalPath: "/contact/"
+      },
+      header: "main",
+      sections: ["contact-hero", "contact-message", "contact-faq"],
       footer: "main"
     },
 

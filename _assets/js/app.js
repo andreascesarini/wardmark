@@ -231,12 +231,35 @@ function renderHeroImages() {
       hero.style.setProperty("--hero-overlay", image.overlay);
     }
 
-    let imageElement = hero.querySelector(":scope > .hero-background-image");
+    let imageElement = hero.querySelector(".hero-background-image");
 
     if (!imageElement) {
+      const viewport = document.createElement("div");
+      viewport.className = "hero-artwork-viewport";
+      viewport.setAttribute("aria-hidden", "true");
+      const layer = document.createElement("div");
+      layer.className = "hero-artwork-layer";
       imageElement = document.createElement("img");
       imageElement.className = "hero-background-image";
-      hero.prepend(imageElement);
+      layer.append(imageElement);
+      viewport.append(layer);
+      hero.prepend(viewport);
+
+      // Preserve the existing image composition in a viewport-fixed frame.
+      // Only layout changes need measurements; scrolling is handled by CSS.
+      const positionArtwork = () => {
+        const bounds = hero.getBoundingClientRect();
+        hero.style.setProperty("--hero-document-top", `${bounds.top + window.scrollY}px`);
+        hero.style.setProperty("--hero-document-left", `${bounds.left + window.scrollX}px`);
+        hero.style.setProperty("--hero-frame-width", `${bounds.width}px`);
+        hero.style.setProperty("--hero-frame-height", `${bounds.height}px`);
+        hero.classList.add("hero-fixed-artwork");
+      };
+      const observer = new ResizeObserver(positionArtwork);
+      observer.observe(hero);
+      const header = document.getElementById("site-header");
+      if (header) observer.observe(header);
+      positionArtwork();
     }
 
     imageElement.src = imageSrc;
@@ -353,68 +376,58 @@ function getNativeLeadCaptureSettings() {
   return leadCapture.native || {};
 }
 
-function renderServiceOptions(options) {
-  return options.map((option) => {
-    return `<option value="${escapeHtml(option)}">${escapeHtml(option)}</option>`;
-  }).join("");
-}
-
 function renderNativeLeadForm() {
   const native = getNativeLeadCaptureSettings();
   const endpoint = getSettingValue(native.endpoint) || "/api/lead";
   const confirmation = native.sendLeadConfirmation === false ? "false" : "true";
-  const serviceOptions = Array.isArray(native.serviceOptions) ? native.serviceOptions : [];
-  const serviceField = serviceOptions.length
-    ? `
-      <label class="form-field">
-        Service
-        <select name="service">
-          <option value="">Select a service</option>
-          ${renderServiceOptions(serviceOptions)}
-        </select>
-      </label>
-    `
-    : `
-      <label class="form-field">
-        Service
-        <input type="text" name="service" autocomplete="off">
-      </label>
-    `;
+  const businessName = escapeHtml(settings.business?.name || "Wardmark");
 
   return `
-    <form class="lead-capture-form" action="${escapeHtml(endpoint)}" method="post" data-native-lead-form>
+    <form class="lead-capture-form" action="${escapeHtml(endpoint)}" method="post" aria-label="Join the waiting list" data-native-lead-form>
       <input type="hidden" name="sendLeadConfirmation" value="${confirmation}">
       <input type="hidden" name="businessName" value="${escapeHtml(settings.business?.name || "")}">
 
-      <label class="form-field lead-form-honeypot">
+      <label class="form-field lead-form-honeypot" aria-hidden="true">
         Company
         <input type="text" name="company" tabindex="-1" autocomplete="off">
       </label>
 
       <label class="form-field">
-        Name *
-        <input type="text" name="name" autocomplete="name" required>
+        Full name
+        <input type="text" name="name" autocomplete="name" maxlength="120" required>
       </label>
 
       <label class="form-field">
-        Email *
-        <input type="email" name="email" autocomplete="email" required>
+        Work email
+        <input type="email" name="email" autocomplete="email" maxlength="180" required>
       </label>
 
       <label class="form-field">
-        Phone *
-        <input type="tel" name="phone" autocomplete="tel" required>
+        Mobile number (optional)
+        <input type="tel" name="phone" autocomplete="tel" maxlength="32">
+        <span class="form-help">Include the country code, for example +46.</span>
       </label>
-
-      ${serviceField}
 
       <label class="form-field">
-        Message
-        <textarea name="message" rows="5"></textarea>
+        Organisation
+        <input type="text" name="organisation" autocomplete="organization" maxlength="180" required>
       </label>
-      <p class="form-help">Select a service or add a message so we know how to help.</p>
 
-      <button class="button" type="submit" data-native-lead-submit>Send Inquiry</button>
+      <label class="form-field">
+        Tell us a little about your business
+        <textarea name="message" rows="5" maxlength="3000" required></textarea>
+      </label>
+
+      <fieldset class="marketing-preferences">
+        <legend>Keep in touch (optional)</legend>
+        <label class="form-consent">
+          <input type="checkbox" name="emailMarketingConsent" value="true">
+          <span>I agree to receive marketing emails from ${businessName} about identity security services, availability and offers. I can unsubscribe at any time using the link in each email.</span>
+        </label>
+      </fieldset>
+
+      <p class="form-legal"><a href="/legal/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a> &middot; <a href="/legal/terms-and-conditions/" target="_blank" rel="noopener">Terms &amp; Conditions</a></p>
+      <button class="button" type="submit" data-native-lead-submit>${escapeHtml(native.submitLabel || "Send Inquiry")}</button>
       <p class="lead-form-status" data-native-lead-status role="status" aria-live="polite" hidden></p>
     </form>
   `;
@@ -430,6 +443,13 @@ function getLeadCaptureHtml() {
   return renderNativeLeadForm();
 }
 
+function renderLeadCaptureSlots() {
+  document.querySelectorAll("[data-lead-capture-slot]").forEach((slot) => {
+    slot.innerHTML = getLeadCaptureHtml();
+    activateInsertedScripts(slot);
+  });
+}
+
 function renderLeadCaptureModal() {
   const modalRoot = document.createElement("div");
   modalRoot.id = "site-modals";
@@ -438,7 +458,7 @@ function renderLeadCaptureModal() {
   modalRoot.innerHTML = `
     <div class="lead-modal" id="lead-modal" hidden>
       <div class="lead-modal-backdrop" data-lead-capture-close></div>
-      <div class="lead-modal-panel" role="dialog" aria-modal="true" aria-label="Lead capture">
+      <div class="lead-modal-panel" role="dialog" aria-modal="true" aria-label="Join the waiting list">
         <button class="lead-modal-close" type="button" data-lead-capture-close aria-label="Close lead form">x</button>
         <div class="lead-capture-placeholder"></div>
       </div>
@@ -463,7 +483,7 @@ function renderLeadCaptureModal() {
 
 function getNativeLeadSuccessMessage() {
   const native = getNativeLeadCaptureSettings();
-  return native.successMessage || "Thanks. We received your request and will follow up shortly.";
+  return native.successMessage || "Thank you. You’re on the waiting list.";
 }
 
 function getNativeLeadErrorMessage() {
@@ -471,8 +491,8 @@ function getNativeLeadErrorMessage() {
   return native.errorMessage || "Sorry, something went wrong. Please try again or contact us directly.";
 }
 
-function setLeadFormStatus(form, message, type) {
-  const status = form.querySelector("[data-native-lead-status]");
+function setNativeFormStatus(form, message, type, selector) {
+  const status = form.querySelector(selector);
 
   if (!status) {
     return;
@@ -483,17 +503,43 @@ function setLeadFormStatus(form, message, type) {
   status.dataset.status = type;
 }
 
-function hasLeadContext(form) {
-  const formData = new FormData(form);
-  return getSettingValue(formData.get("service")) || getSettingValue(formData.get("message"));
+function validateLeadPhone(form) {
+  const phone = form.elements.namedItem("phone");
+  const number = phone.value.trim().replace(/[ ().-]/g, "");
+  let error = "";
+
+  if (number && !/^\+[1-9]\d{6,14}$/.test(number)) {
+    error = "Enter a valid mobile number with its country code, starting with +.";
+  }
+
+  phone.setCustomValidity(error);
 }
 
 async function submitNativeLeadForm(form) {
-  const submitButton = form.querySelector("[data-native-lead-submit]");
+  return submitNativeForm(form, {
+    submitSelector: "[data-native-lead-submit]",
+    statusSelector: "[data-native-lead-status]",
+    successMessage: getNativeLeadSuccessMessage(),
+    errorMessage: getNativeLeadErrorMessage(),
+    validate: validateLeadPhone
+  });
+}
+
+async function submitNativeContactForm(form) {
+  return submitNativeForm(form, {
+    submitSelector: "[data-native-contact-submit]",
+    statusSelector: "[data-native-contact-status]",
+    successMessage: "Thank you. Your message has been sent.",
+    errorMessage: "Sorry, your message could not be sent. Please try again."
+  });
+}
+
+async function submitNativeForm(form, options) {
+  const submitButton = form.querySelector(options.submitSelector);
   const originalLabel = submitButton?.textContent;
 
-  if (!hasLeadContext(form)) {
-    setLeadFormStatus(form, "Select a service or add a message so we know how to help.", "error");
+  options.validate?.(form);
+  if (submitButton?.disabled || !form.reportValidity()) {
     return;
   }
 
@@ -502,7 +548,7 @@ async function submitNativeLeadForm(form) {
     submitButton.textContent = "Sending...";
   }
 
-  setLeadFormStatus(form, "", "pending");
+  setNativeFormStatus(form, "", "pending", options.statusSelector);
 
   try {
     const response = await fetch(form.action, {
@@ -514,14 +560,15 @@ async function submitNativeLeadForm(form) {
     });
     const data = await response.json().catch(() => ({}));
 
-    if (!response.ok || data.ok === false) {
-      throw new Error(data.message || getNativeLeadErrorMessage());
+    if (!response.ok || data.ok !== true) {
+      throw new Error(data.message || options.errorMessage);
     }
 
     form.reset();
-    setLeadFormStatus(form, data.message || getNativeLeadSuccessMessage(), "success");
+    options.validate?.(form);
+    setNativeFormStatus(form, options.successMessage, "success", options.statusSelector);
   } catch (error) {
-    setLeadFormStatus(form, error.message || getNativeLeadErrorMessage(), "error");
+    setNativeFormStatus(form, error.message || options.errorMessage, "error", options.statusSelector);
   } finally {
     if (submitButton) {
       submitButton.disabled = false;
@@ -531,15 +578,28 @@ async function submitNativeLeadForm(form) {
 }
 
 function bindNativeLeadForms() {
-  document.addEventListener("submit", (event) => {
+  const validatePhone = (event) => {
     const form = event.target.closest("[data-native-lead-form]");
+    if (form && event.target.name === "phone") {
+      validateLeadPhone(form);
+    }
+  };
+  document.addEventListener("input", validatePhone);
+  document.addEventListener("change", validatePhone);
+
+  document.addEventListener("submit", (event) => {
+    const form = event.target.closest("[data-native-lead-form], [data-native-contact-form]");
 
     if (!form) {
       return;
     }
 
     event.preventDefault();
-    submitNativeLeadForm(form);
+    if (form.hasAttribute("data-native-contact-form")) {
+      submitNativeContactForm(form);
+    } else {
+      submitNativeLeadForm(form);
+    }
   });
 }
 
@@ -677,6 +737,14 @@ function renderCtas() {
 }
 
 function openLeadCapture() {
+  const inlineSlot = document.querySelector("[data-lead-capture-slot]");
+
+  if (inlineSlot) {
+    inlineSlot.scrollIntoView({ block: "center" });
+    inlineSlot.querySelector('input:not([type="hidden"]):not([tabindex="-1"]), textarea, button')?.focus({ preventScroll: true });
+    return;
+  }
+
   const modal = document.getElementById("lead-modal");
 
   if (!modal) {
@@ -780,15 +848,58 @@ function bindMobileNav() {
     return;
   }
 
+  const dropdown = nav.querySelector(".nav-dropdown");
+  const hoverNavigation = window.matchMedia("(min-width: 901px) and (hover: hover) and (pointer: fine)");
+  let dropdownCloseTimer;
+  let openedByHover = false;
+  const closeDropdown = () => {
+    window.clearTimeout(dropdownCloseTimer);
+    openedByHover = false;
+    if (dropdown) dropdown.open = false;
+  };
+
+  dropdown?.addEventListener("pointerenter", (event) => {
+    if (!hoverNavigation.matches || event.pointerType === "touch") return;
+    window.clearTimeout(dropdownCloseTimer);
+    if (!dropdown.open) {
+      openedByHover = true;
+      dropdown.open = true;
+    }
+  });
+
+  dropdown?.addEventListener("pointerleave", (event) => {
+    if (!hoverNavigation.matches || event.pointerType === "touch") return;
+    dropdownCloseTimer = window.setTimeout(() => {
+      if (!dropdown.matches(":hover") && !dropdown.contains(document.activeElement)) {
+        closeDropdown();
+      }
+    }, 180);
+  });
+
+  dropdown?.querySelector("summary").addEventListener("click", (event) => {
+    // A pointer click following hover should keep the newly opened menu available.
+    if (hoverNavigation.matches && event.detail > 0 && openedByHover && dropdown.open) {
+      event.preventDefault();
+    }
+    openedByHover = false;
+  });
+
+  hoverNavigation.addEventListener("change", closeDropdown);
+
+  const currentPath = window.location.pathname.replace(/\/$/, "") || "/";
+  links.querySelectorAll("a").forEach((link) => {
+    if ((link.pathname.replace(/\/$/, "") || "/") === currentPath) {
+      link.setAttribute("aria-current", "page");
+    }
+  });
+
   const setOpen = (isOpen) => {
     nav.classList.toggle("nav-open", isOpen);
     toggle.setAttribute("aria-expanded", String(isOpen));
     toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
 
     if (!isOpen) {
-      nav.querySelectorAll(".nav-dropdown[open]").forEach((dropdown) => {
-        dropdown.removeAttribute("open");
-      });
+      closeDropdown();
     }
   };
 
@@ -805,12 +916,26 @@ function bindMobileNav() {
   document.addEventListener("click", (event) => {
     if (!nav.contains(event.target)) {
       setOpen(false);
+    } else if (dropdown && !dropdown.contains(event.target)) {
+      closeDropdown();
+    }
+  });
+
+  dropdown?.addEventListener("focusout", (event) => {
+    if (event.relatedTarget && !dropdown.contains(event.relatedTarget)) {
+      closeDropdown();
     }
   });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
-      setOpen(false);
+      if (dropdown?.open) {
+        closeDropdown();
+        dropdown.querySelector("summary").focus();
+      } else if (nav.classList.contains("nav-open")) {
+        setOpen(false);
+        toggle.focus();
+      }
     }
   });
 }
@@ -865,6 +990,7 @@ async function renderPage() {
 
   await renderSections(remainingSections, { clear: false });
   document.getElementById("site-footer").innerHTML = await footerPromise;
+  renderLeadCaptureSlots();
   renderDynamicSettings();
   renderCtas();
   renderIntegrations();

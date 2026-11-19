@@ -1,0 +1,7 @@
+# Keep Cloudflare Pages default and preview URLs out of search results.
+# Custom domains are unaffected by these host-specific rules.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex
